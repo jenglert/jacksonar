@@ -1,0 +1,39 @@
+.App-header {
+  background-color: #46b5ff;
+  height: 30px;
+  padding: 20px;
+  color: white; }
+
+.App-title {
+  font-size: 1.5em; }
+
+.App-intro {
+  font-size: large; }
+
+.footer {
+  position: fixed;
+  z-index: 100;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #46b5ff;
+  padding: 5px 10px; }
+
+.login {
+  margin: 20px;
+  height: 80px;
+  display: flex;
+  align-items: center; }
+  .login .label {
+    width: 90px;
+    display: inline-block;
+    text-align: right;
+    padding-right: 5px; }
+  .login LABEL {
+    display: block;
+    padding: 5px 0; }
+  .login .submit-element INPUT {
+    background-color: #64d2ff;
+    height: 48px;
+    width: 80px;
+    margin-left: 10px; }
