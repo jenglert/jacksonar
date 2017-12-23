@@ -37,3 +37,24 @@
     height: 48px;
     width: 80px;
     margin-left: 10px; }
+  .login .submit-element {
+    position: relative;
+    overflow: hidden; }
+  .login .is-loading:before {
+    content: "";
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    top: 10px;
+    left: 34px;
+    background: url(../images/loader.png) no-repeat;
+    background-size: 30px 30px;
+    animation: rotating 4s infinite linear; }
+
+@keyframes rotating {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg); }
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg); } }

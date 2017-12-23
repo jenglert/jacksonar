@@ -4,7 +4,7 @@ class Footer extends Component {
 	
 	render() {
 		return (
-			<div class="footer">
+			<div className="footer">
 				&lt;3 u Jackson!
 			</div>
 		);

@@ -2,7 +2,8 @@ import AWS from 'aws-sdk';
 
 import { CognitoUserPool, CognitoUser, AuthenticationDetails } from 'amazon-cognito-identity-js';
 
-
+// Sets logged in credentials globally on the AWS object.  It's somewhat unfortunate that
+// we store the 'logged in' state in react state + AWS global state, but life goes on...
 const loginToAws = (username, password) => {
     const poolData = {
         UserPoolId: "us-east-1_YFHZEPdFQ",

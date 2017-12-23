@@ -1,48 +1,63 @@
 import React, { Component } from 'react';
 import loginToAws from './Aws.js';
-import listBucket from './S3.js';
 
 class Login extends Component {
 
     constructor(props) {
         super(props);
-        this.state = { username: '', password: '' };
+        this.state = { username: '', password: '', isLoading: false };
 
         this.handleSubmit = this.handleSubmit.bind(this);
-        this.handleChangeUsername = this.handleChangeUsername.bind(this);
-        this.handleChangePassword = this.handleChangePassword.bind(this);
     }
 
-    handleChangeUsername(event) {
+    handleChangeUsername = (event) => {
         this.setState({ username: event.target.value });
     }
 
-    handleChangePassword(event) {
+    handleChangePassword = (event) => {
         this.setState({ password: event.target.value });
     }
 
     async handleSubmit(event) {
+        this.setState({ isLoading: true });
+
         event.preventDefault();
         await loginToAws(this.state.username, this.state.password);
 
-        listBucket("pi-pics");
+        this.props.onLoggedIn();
+    }
+
+    renderLoginButton = () => {
+        if (this.state.isLoading) {
+            return (<input type="submit" value="" className="loading-submit" disabled="true" />);
+        } else {
+            return (<input type="submit" value="Login" />);
+        }
+    }
+
+    renderLogginInClass = () => {
+        if (this.state.isLoading) {
+            return "submit-element is-loading";
+        } else {
+            return "submit-element";
+        }
     }
 
     render() {
         return (
-            <form onSubmit={this.handleSubmit} class="login">
-                <div class="input-elements">
+            <form onSubmit={this.handleSubmit} className="login">
+                <div className="input-elements">
                     <label>
-                        <div class="label">email:</div>
+                        <div className="label">email:</div>
                         <input type="text" value={this.state.username} onChange={this.handleChangeUsername} />
                     </label>
                     <label>
-                        <div class="label">password:</div>
+                        <div className="label">password:</div>
                         <input type="password" value={this.state.password} onChange={this.handleChangePassword} />
                     </label>
                 </div>
-                <div class="submit-element">
-                    <input type="submit" value="Login" />
+                <div className={this.renderLogginInClass()}>
+                    {this.renderLoginButton()}
                 </div>
             </form>
         );
