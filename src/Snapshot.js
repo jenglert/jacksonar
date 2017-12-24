@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import * as S3 from './S3.js';
 import Time from 'react-time'
+import './Snapshot.css';
 
 class Snapshot extends Component {
 
@@ -21,17 +22,15 @@ class Snapshot extends Component {
             <div key={fn} className="snapshot">
                 <div class="snapshot-layout">
                     <div class="image">
-                        <img id={"img-" + fn} src="" alt="" height="25%" width="25%" /> 
+                        <img id={"img-" + fn} src="" alt="" height="270" width="320" /> 
                     </div>
                     <div class="stats">
                         <div class="time">
                             <Time value={date} titleFormat="YYYY/MM/DD HH:mm" relative />
                         </div>
-                        <div class="temp">
-                            {tempInF}F
-                        </div>
-                        <div class="humidity">
-                            {humidity}%
+                        <div class="temp-and-humidity">
+                            <div>{tempInF}&#176;F</div>
+                            <div>{humidity}%</div>
                         </div>
                     </div>
                 </div>

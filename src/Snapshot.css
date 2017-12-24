@@ -1,0 +1,23 @@
+.stats { 
+    padding-left: 15px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 19px;
+}
+
+.snapshot-layout {
+    display: flex;
+}
+
+.snapshot {
+    border: 2px solid rgba(70, 181, 255, 0.2);
+    width: 465px;
+    height: 270px;
+    padding: 15px;
+    margin: 20px;
+    float: left;
+}
+
+.temp-and-humidity {
+    display: flex;
+    justify-content: space-around;
+}
