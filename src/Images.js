@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import * as S3 from './S3.js';
+import Snapshot from './Snapshot.js';
+import * as DDB from './DDB.js';
 
 class Images extends Component {
 
@@ -7,13 +8,26 @@ class Images extends Component {
         super(props);
 
         this.state = {
-            fileNames: ["loading"],
+            snapshots: {},
             isLoading: true
         }
 
-        S3.listBucket(3).then((result) => {
-            this.setState({ fileNames: result, isLoading: false });
+        DDB.listMostRecentRecords(3).then((result) => {
+            // [{filename, humidity, date, tempInF, picture-set}]
+            this.setState({ 
+                isLoading: false,
+                snapshots: result.Items.map((item) => Images.buildSnapshot(item))
+            }); 
         });
+    }
+
+    static buildSnapshot(ddbResult) {
+        return {
+            filename: ddbResult.filename["S"],
+            humidity: parseFloat(ddbResult.humidity["N"]),
+            tempInF: parseFloat(ddbResult.tempInF["N"]),
+            date: new Date(ddbResult.date["S"])
+        };
     }
 
     render() {
@@ -21,28 +35,21 @@ class Images extends Component {
             return (<div>It's loading!!!</div>)
         } else {
 
-            const listItems = this.state.fileNames.map((fn) => {
-
-                S3.getObjectData(fn).then((data) => {
-                    var blob = new Blob( [ data ], { type: "image/jpeg" } );
-                    var urlCreator = window.URL || window.webkitURL;
-                    var imageUrl = urlCreator.createObjectURL( blob );
-                    document.getElementById("img-" + fn).src = imageUrl;
-                });
-
+            const listItems = this.state.snapshots.map((snap) => {
                 return (
-                    <li key={fn}>
-                        <img id={"img-" + fn} src="" alt="" height="25%" width="25%" /> <br />
-
-                        {fn}
-                    </li>
+                    <Snapshot 
+                        filename={snap.filename} 
+                        key={"image-" + snap.filename} 
+                        humidity={snap.humidity}
+                        tempInF={snap.tempInF}
+                        date={snap.date} />
                 );
             });
 
             return (
-                <ul>
+                <div className="snapshots" >
                     {listItems}
-                </ul>
+                </div>
             );
         }
     }
