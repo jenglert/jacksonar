@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import loginToAws from './Aws.js';
 
-class Login extends Component {
+class LoginForm extends Component {
 
     constructor(props) {
         super(props);
@@ -64,4 +64,4 @@ class Login extends Component {
     }
 }
 
-export default Login;
+export default LoginForm;

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './styles/App.css';
-import Login from './Login.js';
+import LoginForm from './LoginForm.js';
 import Footer from './Footer.js';
 import Images from './Images.js';
 
@@ -14,14 +14,14 @@ class App extends Component {
   }
 
   onLoggedIn = () => {
-    this.setState({ ...this.state, loggedIn: true });
+    this.setState({ loggedIn: true });
   }
 
   renderLoginOrContent = () => {
     if (this.state.loggedIn) {
       return <Images />
     } else {
-      return <Login onLoggedIn={this.onLoggedIn} />
+      return <LoginForm onLoggedIn={this.onLoggedIn} />
     }
   }
 

@@ -31,10 +31,8 @@ const loginToAws = (username, password) => {
     return new Promise(function(resolve, reject) {
         cognitoUser.authenticateUser(authenticationDetails, {
             onSuccess: function (result) {
-                console.log('access token + ' + result.getAccessToken().getJwtToken());
-    
                AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-                    IdentityPoolId: 'us-east-1:1e1afa1c-07a9-43ad-8092-eaf1836cfa57', // your identity pool id here
+                    IdentityPoolId: 'us-east-1:1e1afa1c-07a9-43ad-8092-eaf1836cfa57', 
                     RoleArn: "arn:aws:iam::725929794843:role/Cognito_jacksonarAuth_Role",
                     Logins: {
                         // Change the key below according to the specific region your user pool is in.
