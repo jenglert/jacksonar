@@ -3,6 +3,7 @@ import './styles/App.css';
 import LoginForm from './LoginForm.js';
 import Footer from './Footer.js';
 import Images from './Images.js';
+import AWS from 'aws-sdk';
 
 class App extends Component {
 
@@ -11,6 +12,9 @@ class App extends Component {
     this.state = {
       loggedIn: false
     }
+
+    // Might as well set the global var here...
+    AWS.config.region = 'us-east-1';
   }
 
   onLoggedIn = () => {
