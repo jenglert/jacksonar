@@ -2,6 +2,13 @@ import AWS from 'aws-sdk';
 
 import { CognitoUserPool, CognitoUser, AuthenticationDetails } from 'amazon-cognito-identity-js';
 
+const poolData = {
+    UserPoolId: "us-east-1_YFHZEPdFQ",
+    ClientId: "4bq6t81ffhhtficadhjiahm9ei"
+};
+
+var userPool = new CognitoUserPool(poolData);
+
 export const setAwsCredentials = (accessKey) => {
     AWS.config.credentials = new AWS.CognitoIdentityCredentials({
         IdentityPoolId: 'us-east-1:1e1afa1c-07a9-43ad-8092-eaf1836cfa57',
@@ -17,7 +24,7 @@ export const setAwsCredentials = (accessKey) => {
  *  Refreshes an access key so it doesn't expire after ~20 minutes.
  */
 export const refreshAccessKey = (accessKey) => {
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
         //refreshes credentials using AWS.CognitoIdentity.getCredentialsForIdentity()
         AWS.config.credentials.refresh((error) => {
             if (error) {
@@ -27,7 +34,39 @@ export const refreshAccessKey = (accessKey) => {
                 console.log('Successfully logged in!');
                 resolve(accessKey);
             }
-        }); 
+        });
+    });
+}
+
+export class PasswordNeedsResetError extends Error {
+    constructor(...params) {
+        // Pass remaining arguments (including vendor specific ones) to parent constructor
+        super(...params);
+
+        // Maintains proper stack trace for where our error was thrown (only available on V8)
+        if (Error.captureStackTrace) {
+            Error.captureStackTrace(this, PasswordNeedsResetError);
+        }
+    }
+}
+
+export const unlockPassword = (username, newPassword, verificationCode) => {
+    var userData = {
+        Username: username,
+        Pool: userPool
+    };
+
+    var cognitoUser = new CognitoUser(userData);
+
+    return new Promise(function(resolve, reject) {
+        cognitoUser.confirmPassword(verificationCode, newPassword, {
+            onSuccess() {
+                resolve('Your password has been reset.');
+            },
+            onFailure(err) {
+                reject('Unable to reset password: ' + err);
+            }
+        });
     });
 }
 
@@ -37,25 +76,18 @@ export const refreshAccessKey = (accessKey) => {
  * 
  * @returns a promise with the JWT token - or a failure message
  */
-const loginToAws = (username, password) => {
-    const poolData = {
-        UserPoolId: "us-east-1_YFHZEPdFQ",
-        ClientId: "4bq6t81ffhhtficadhjiahm9ei"
-    };
-
-    var userPool = new CognitoUserPool(poolData);
-
+export const loginToAws = (username, password) => {
     var authenticationData = {
         Username: username,
         Password: password,
     };
 
+    var authenticationDetails = new AuthenticationDetails(authenticationData);
+
     var userData = {
         Username: username,
         Pool: userPool
     };
-
-    var authenticationDetails = new AuthenticationDetails(authenticationData);
 
     var cognitoUser = new CognitoUser(userData);
 
@@ -67,15 +99,13 @@ const loginToAws = (username, password) => {
             },
 
             onFailure: function (err) {
-                reject(new Error("Unable to authenticate: " + err));
+                reject(err);
             },
 
             newPasswordRequired: function (userAttributes, requiredAttributes) {
-                reject(new Error("A new password is required. Too bad I haven't build this capability!"));
+                reject(new PasswordNeedsResetError());
             }
 
         });
     });
 }
-
-export default loginToAws;

@@ -35,6 +35,15 @@
     border-radius: 3px;
     padding: 5px;
     background-color: #ff1c1cb4; }
+  .login .validation-message {
+    flex-grow: 2;
+    color: white;
+    font-size: 14px;
+    text-align: center;
+    border: 1px solid gray;
+    border-radius: 3px;
+    padding: 5px;
+    background-color: #34df00; }
   .login .label {
     width: 90px;
     display: inline-block;
