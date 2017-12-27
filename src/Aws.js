@@ -38,17 +38,13 @@ export const refreshAccessKey = (accessKey) => {
     });
 }
 
-export class PasswordNeedsResetError extends Error {
-    constructor(...params) {
-        // Pass remaining arguments (including vendor specific ones) to parent constructor
-        super(...params);
-
-        // Maintains proper stack trace for where our error was thrown (only available on V8)
-        if (Error.captureStackTrace) {
-            Error.captureStackTrace(this, PasswordNeedsResetError);
-        }
-    }
+export function PasswordNeedsResetError(message) {
+    this.name = 'PasswordNeedsResetError';
+    this.message = message;
+    this.stack = (new Error()).stack;
 }
+PasswordNeedsResetError.prototype = new Error;
+
 
 export const unlockPassword = (username, newPassword, verificationCode) => {
     var userData = {

@@ -9,7 +9,7 @@ class LoginForm extends Component {
         this.state = {
             username: '',
             password: '',
-            verificationCode: 'here',
+            verificationCode: '',
             isLoading: false,
             errorMsg: false,
             resetPassword: false,
@@ -55,7 +55,7 @@ class LoginForm extends Component {
             }).catch(function (err) {
                 if ((err.code && (err.code === 'PasswordResetRequiredException')) ||
                     err instanceof PasswordNeedsResetError) {
-                        that.setState({ errorMsg: 'Your password need to be reset.  You should receive a verification code via email', resetPassword: true, isLoading: false });
+                        that.setState({ errorMsg: 'Your password need to be reset.  You should have received a verification code via email', resetPassword: true, isLoading: false });
                     return;
                 }
                 that.setState({ errorMsg: err.message, isLoading: false });
