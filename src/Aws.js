@@ -2,7 +2,7 @@ import AWS from 'aws-sdk';
 
 import { CognitoUserPool, CognitoUser, AuthenticationDetails } from 'amazon-cognito-identity-js';
 
-const setAwsCredentials = (accessKey) => {
+export const setAwsCredentials = (accessKey) => {
     AWS.config.credentials = new AWS.CognitoIdentityCredentials({
         IdentityPoolId: 'us-east-1:1e1afa1c-07a9-43ad-8092-eaf1836cfa57',
         RoleArn: "arn:aws:iam::725929794843:role/Cognito_jacksonarAuth_Role",
@@ -16,7 +16,7 @@ const setAwsCredentials = (accessKey) => {
 /**
  *  Refreshes an access key so it doesn't expire after ~20 minutes.
  */
-const refreshAccessKey = (accessKey) => {
+export const refreshAccessKey = (accessKey) => {
     return new Promise(function(resolve, reject) {
         //refreshes credentials using AWS.CognitoIdentity.getCredentialsForIdentity()
         AWS.config.credentials.refresh((error) => {
@@ -67,11 +67,11 @@ const loginToAws = (username, password) => {
             },
 
             onFailure: function (err) {
-                reject("Unable to authenticate: " + err);
+                reject(new Error("Unable to authenticate: " + err));
             },
 
             newPasswordRequired: function (userAttributes, requiredAttributes) {
-                reject("A new password is required. Too bad I haven't build this capability!");
+                reject(new Error("A new password is required. Too bad I haven't build this capability!"));
             }
 
         });

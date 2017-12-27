@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import loginToAws from './Aws.js';
+import { timeout } from 'promise-timeout';
 
 class LoginForm extends Component {
 
     constructor(props) {
         super(props);
-        this.state = { username: '', password: '', isLoading: false };
+        this.state = { username: '', password: '', isLoading: false, errorMsg: false };
 
         this.handleSubmit = this.handleSubmit.bind(this);
     }
@@ -18,13 +19,18 @@ class LoginForm extends Component {
         this.setState({ password: event.target.value });
     }
 
-    async handleSubmit(event) {
-        this.setState({ isLoading: true });
-
+    handleSubmit(event) {
         event.preventDefault();
-        await loginToAws(this.state.username, this.state.password);
+        let thisComp = this;
 
-        this.props.onLoggedIn();
+        this.setState({ isLoading: true, errorMsg: false });
+
+        timeout(loginToAws(this.state.username, this.state.password), 5000)
+            .then(function (accessKey) {
+                thisComp.props.onLoggedIn(accessKey);
+            }).catch(function (err) {
+                thisComp.setState({ errorMsg: err.message, isLoading: false });
+            })
     }
 
     renderLoginButton = () => {
@@ -43,9 +49,21 @@ class LoginForm extends Component {
         }
     }
 
+    renderValidationError = () => {
+        if (this.state.errorMsg) {
+            return (<div className="validation-error" >
+                {this.state.errorMsg}
+            </div>
+            );
+        } else {
+            return null;
+        }
+    }
+
     render() {
         return (
             <form onSubmit={this.handleSubmit} className="login">
+                {this.renderValidationError()}
                 <div className="input-elements">
                     <label>
                         <div className="label">email:</div>

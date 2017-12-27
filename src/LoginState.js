@@ -1,34 +1,25 @@
-import React, { Component } from 'react';
-import loginToAws from './Aws.js';
+import { Component } from 'react';
 import cookie from 'react-cookies'
 
+// TODO: clean this up - the class is somewhat disasterful...
 class LoginState extends Component {
 
-    constructor(props) {
-        super(props);
+    static saveAccessKey = (accessKey) => {
+        if (accessKey.length > 20) {  // Abject hackery to avoid an invalid cookie from being set due to developer error.
+            throw "Invalid access key detected.";
+        }
+        cookie.save('ak', accessKey, { path: '/' })
     }
 
-    loginCookieName = 'ak';
-
-    saveAccessKey = (accessKey) => {
-        cookie.save(loginCookieName, accessKey, { path: '/' })
-    }
-
-    getAccessKey = () => {
-        const cookieVal = cookie.load(loginCookieName);
+    static getAccessKey = () => {
+        const cookieVal = cookie.load('ak');
 
         if (cookieVal != null) {
             // TODO: test the cookie's validity
             return cookieVal;
         }
 
-        return false;
-    }
-
-    render() {
-        return (
-            null
-        );
+        return null;
     }
 }
 

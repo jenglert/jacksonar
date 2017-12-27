@@ -4,6 +4,8 @@ import LoginForm from './LoginForm.js';
 import Footer from './Footer.js';
 import Images from './Images.js';
 import AWS from 'aws-sdk';
+import LoginState from './LoginState.js';
+import { setAwsCredentials } from './Aws.js';
 
 class App extends Component {
 
@@ -17,12 +19,18 @@ class App extends Component {
     AWS.config.region = 'us-east-1';
   }
 
-  onLoggedIn = () => {
+  onLoggedIn = (accessKey) => {
     this.setState({ loggedIn: true });
+    LoginState.saveAccessKey(accessKey);
   }
 
   renderLoginOrContent = () => {
-    if (this.state.loggedIn) {
+    const cookieAccessKey = LoginState.getAccessKey();
+    if (cookieAccessKey != null) {
+      setAwsCredentials(cookieAccessKey);
+    }
+
+    if (this.state.loggedIn || cookieAccessKey != null) {
       return <Images />
     } else {
       return <LoginForm onLoggedIn={this.onLoggedIn} />

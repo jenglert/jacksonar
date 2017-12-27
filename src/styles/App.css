@@ -20,10 +20,21 @@
   padding: 5px 10px; }
 
 .login {
-  margin: 20px;
+  margin: 20px 20px 20px 20px;
   height: 80px;
   display: flex;
-  align-items: center; }
+  flex-flow: row wrap;
+  align-items: center;
+  width: 360px; }
+  .login .validation-error {
+    flex-grow: 2;
+    color: white;
+    font-size: 14px;
+    text-align: center;
+    border: 1px solid gray;
+    border-radius: 3px;
+    padding: 5px;
+    background-color: #ff1c1cb4; }
   .login .label {
     width: 90px;
     display: inline-block;
@@ -36,7 +47,8 @@
     background-color: #64d2ff;
     height: 48px;
     width: 80px;
-    margin-left: 10px; }
+    margin-left: 10px;
+    border-radius: 3px; }
   .login .submit-element {
     position: relative;
     overflow: hidden; }
