@@ -10,20 +10,21 @@ const poolData = {
 var userPool = new CognitoUserPool(poolData);
 
 export const setAwsCredentials = (accessKey) => {
+    console.log("Setting access key:" + accessKey);
     AWS.config.credentials = new AWS.CognitoIdentityCredentials({
         IdentityPoolId: 'us-east-1:1e1afa1c-07a9-43ad-8092-eaf1836cfa57',
         RoleArn: "arn:aws:iam::725929794843:role/Cognito_jacksonarAuth_Role",
         Logins: {
-            // Change the key below according to the specific region your user pool is in.
             'cognito-idp.us-east-1.amazonaws.com/us-east-1_YFHZEPdFQ': accessKey
         }
     });
+    console.log("Access key set");
 }
 
 /**
  *  Refreshes an access key so it doesn't expire after ~20 minutes.
  */
-export const refreshAccessKey = (accessKey) => {
+export const refreshAccessKey = () => {
     return new Promise(function (resolve, reject) {
         //refreshes credentials using AWS.CognitoIdentity.getCredentialsForIdentity()
         AWS.config.credentials.refresh((error) => {
@@ -32,15 +33,34 @@ export const refreshAccessKey = (accessKey) => {
             } else {
 
                 console.log('Successfully logged in!');
-                resolve(accessKey);
+                resolve();
             }
         });
     });
 }
 
-export function PasswordNeedsResetError(message) {
+export const resetPasswordAuthenticated = (cognitoUser, newPassword) => {
+    new Promise(function (resolve, reject) {
+
+        cognitoUser.completeNewPasswordChallenge(newPassword, null, {
+            onSuccess: function (result) {
+                console.log("User completed new user challenge: " + cognitoUser.username);
+                resolve(true);
+            },
+
+            onFailure: function (err) {
+                console.log("Failed to complete new user challenge: " + cognitoUser.username);
+                reject(err);
+            },
+        });
+
+    });
+}
+
+export function PasswordNeedsResetError(message, cognitoUser) {
     this.name = 'PasswordNeedsResetError';
     this.message = message;
+    this.cognitoUser = cognitoUser;
     this.stack = (new Error()).stack;
 }
 PasswordNeedsResetError.prototype = new Error;
@@ -54,12 +74,14 @@ export const unlockPassword = (username, newPassword, verificationCode) => {
 
     var cognitoUser = new CognitoUser(userData);
 
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
         cognitoUser.confirmPassword(verificationCode, newPassword, {
             onSuccess() {
+                console.log("User password reset with verification code: " + username);
                 resolve('Your password has been reset.');
             },
             onFailure(err) {
+                console.log("Failed to reset user password with verification code: " + username);
                 reject('Unable to reset password: ' + err);
             }
         });
@@ -88,18 +110,23 @@ export const loginToAws = (username, password) => {
     var cognitoUser = new CognitoUser(userData);
 
     return new Promise(function (resolve, reject) {
+        console.log("Authenticating user: " + username);
         cognitoUser.authenticateUser(authenticationDetails, {
             onSuccess: function (result) {
-                setAwsCredentials(result.getIdToken().getJwtToken());
-                resolve(result.getIdToken().getJwtToken());
+                console.log("User authentication successful: " + username);
+                var accessKey = result.getIdToken().getJwtToken();
+                setAwsCredentials(accessKey);
+                resolve(accessKey);
             },
 
             onFailure: function (err) {
+                console.log("User authentication failed: " + username);
                 reject(err);
             },
 
             newPasswordRequired: function (userAttributes, requiredAttributes) {
-                reject(new PasswordNeedsResetError());
+                console.log("User requires new password: " + username);
+                reject(new PasswordNeedsResetError("Password needs to be reset", cognitoUser));
             }
 
         });

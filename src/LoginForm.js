@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { loginToAws, PasswordNeedsResetError, unlockPassword } from './Aws.js';
+import { loginToAws, PasswordNeedsResetError, unlockPassword, resetPasswordAuthenticated } from './Aws.js';
 import { timeout } from 'promise-timeout';
 
 class LoginForm extends Component {
@@ -12,8 +12,11 @@ class LoginForm extends Component {
             verificationCode: '',
             isLoading: false,
             errorMsg: false,
-            resetPassword: false,
-            userMessage: ''
+            needsVerificationCode: false,
+            needsInitialPasswordReset: false,
+            userMessage: '',
+            newPassword: '',
+            cognitoUser: false
         };
 
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -31,35 +34,63 @@ class LoginForm extends Component {
         this.setState({ verificationCode: event.target.value });
     }
 
+    handleNewPassword = (event) => {
+        this.setState({ newPassword: event.target.value });
+    }
+
     handleSubmit(event) {
         event.preventDefault();
         let that = this;
         this.setState({ isLoading: true, errorMsg: false, userMessage: false });
 
-        if (this.state.resetPassword) {
+        if (this.state.needsVerificationCode) {
+
             timeout(unlockPassword(this.state.username, this.state.password, this.state.verificationCode), 5000)
                 .then(function (unlocked) {
-                    that.setState({ userMessage: 'Your password has been reset.  Please login.', resetPassword: false, errorMsg: false, isLoading: false });
+                    that.setState({ userMessage: 'Your password has been reset.  Please login.', needsVerificationCode: false, errorMsg: false, isLoading: false });
                     return;
                 })
                 .catch(function (err) {
                     that.setState({ errorMsg: 'Unable to reset your password.  Try again?  Or talk to support (i.e. Jim). Error: ' + err, isLoading: false });
                     return;
                 });
-            return;
-        }
 
-        timeout(loginToAws(this.state.username, this.state.password), 5000)
-            .then(function (accessKey) {
-                that.props.onLoggedIn(accessKey);
-            }).catch(function (err) {
-                if ((err.code && (err.code === 'PasswordResetRequiredException')) ||
-                    err instanceof PasswordNeedsResetError) {
-                        that.setState({ errorMsg: 'Your password need to be reset.  You should have received a verification code via email', resetPassword: true, isLoading: false });
+        } else if (this.state.needsInitialPasswordReset) {
+
+            timeout(resetPasswordAuthenticated(this.state.cognitoUser, this.state.newPassword), 5000)
+                .then(function (unlocked) {
+                    that.setState({
+                        userMessage: 'Your password has been reset.  Please login.',
+                        needsInitialPasswordReset: false,
+                        errorMsg: false,
+                        isLoading: false,
+                        password: '',
+                        newPassword: ''
+                    });
                     return;
-                }
-                that.setState({ errorMsg: err.message, isLoading: false });
-            })
+                })
+                .catch(function (err) {
+                    that.setState({ errorMsg: 'Unable to reset your password.  Try again?  Or talk to support (i.e. Jim). Error: ' + err, isLoading: false });
+                    return;
+                });
+
+        } else {
+
+            timeout(loginToAws(this.state.username, this.state.password), 5000)
+                .then(function (accessKey) {
+                    that.props.onLoggedIn(accessKey);
+                }).catch(function (err) {
+                    if (err.code && err.code === 'PasswordResetRequiredException') {
+                        that.setState({ errorMsg: 'Your password need to be reset.  You should have received a verification code via email', needsVerificationCode: true, isLoading: false });
+                        return;
+                    }
+                    if (err instanceof PasswordNeedsResetError) {
+                        that.setState({ errorMsg: 'Your password needs to be reset. Please enter a new password', needsInitialPasswordReset: true, isLoading: false, cognitoUser: err.cognitoUser });
+                        return;
+                    }
+                    that.setState({ errorMsg: err.message, isLoading: false });
+                });
+        }
     }
 
     renderLoginButton = () => {
@@ -100,11 +131,33 @@ class LoginForm extends Component {
         }
     }
 
-    renderResetPassword = () => {
-        if (this.state.resetPassword) {
+    renderPassword = () => {
+        if (this.state.needsInitialPasswordReset) {
+            return null;
+        } else {
+            return (<label>
+                <div className="label">password:</div>
+                <input type="password" value={this.state.password} onChange={this.handleChangePassword} />
+            </label>);
+        }
+    }
+
+    renderVerificationCode = () => {
+        if (this.state.needsVerificationCode) {
             return (<label>
                 <div className="label">code:</div>
                 <input type="text" value={this.state.verificationCode} onChange={this.handleVerificationCodeChange} />
+            </label>);
+        } else {
+            return null;
+        }
+    }
+
+    renderSetNewPassword = () => {
+        if (this.state.needsInitialPasswordReset) {
+            return (<label>
+                <div className="label">new pass:</div>
+                <input type="password" value={this.state.newPassword} onChange={this.handleNewPassword} />
             </label>);
         } else {
             return null;
@@ -121,11 +174,9 @@ class LoginForm extends Component {
                         <div className="label">email:</div>
                         <input type="text" value={this.state.username} onChange={this.handleChangeUsername} />
                     </label>
-                    <label>
-                        <div className="label">password:</div>
-                        <input type="password" value={this.state.password} onChange={this.handleChangePassword} />
-                    </label>
-                    {this.renderResetPassword()}
+                    {this.renderPassword()}
+                    {this.renderVerificationCode()}
+                    {this.renderSetNewPassword()}
                 </div>
                 <div className={this.renderLogginInClass()}>
                     {this.renderLoginButton()}
