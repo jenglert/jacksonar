@@ -1,14 +1,14 @@
+.App {
+  padding-bottom: 60px; }
+
 .App-header {
   background-color: #46b5ff;
-  height: 30px;
-  padding: 20px;
+  height: 32px;
+  padding: 1px 20px 20px 20px;
   color: white; }
 
 .App-title {
   font-size: 1.5em; }
-
-.App-intro {
-  font-size: large; }
 
 .footer {
   position: fixed;
@@ -57,7 +57,8 @@
     height: 48px;
     width: 80px;
     margin-left: 10px;
-    border-radius: 3px; }
+    border-radius: 3px;
+    font-size: 20px; }
   .login .submit-element {
     position: relative;
     overflow: hidden; }
@@ -79,3 +80,6 @@
   100% {
     -webkit-transform: rotate(360deg);
     transform: rotate(360deg); } }
+
+.loading {
+  padding: 15px; }

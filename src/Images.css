@@ -1,0 +1,19 @@
+.show-more {
+    width: 320px;
+    min-width: 270px;
+    flex-basis: 100%;
+    text-align: center;
+}
+
+.show-more INPUT { 
+    background-color: rgb(100,210,255);
+    height: 48px;
+    margin-left: 10px;
+    border-radius: 3px;
+    font-size: 20px;
+}
+
+.snapshots { 
+    display: flex;
+    flex-wrap: wrap;
+}

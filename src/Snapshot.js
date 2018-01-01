@@ -20,19 +20,15 @@ class Snapshot extends Component {
 
         return (
             <div key={fn} className="snapshot">
-                <div className="snapshot-layout">
-                    <div className="image">
-                        <img id={"img-" + fn} src="" alt="" height="270" width="320" /> 
-                    </div>
-                    <div className="stats">
-                        <div className="time">
-                            <Time value={date} titleFormat="YYYY/MM/DD HH:mm" relative />
-                        </div>
-                        <div className="temp-and-humidity">
-                            <div>{tempInF}&#176;F</div>
-                            <div>{humidity}%</div>
-                        </div>
-                    </div>
+                <img id={"img-" + fn} src="" alt=""  />
+                <div className="time">
+                    <Time value={date} titleFormat="YYYY/MM/DD HH:mm" relative />
+                </div>
+                <div className="temp">
+                    <div>{tempInF}&#176;F</div>
+                </div>
+                <div className="humidity">
+                    <div>{humidity}%</div>
                 </div>
             </div>
         );

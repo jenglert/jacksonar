@@ -2,20 +2,26 @@ import AWS from 'aws-sdk';
 
 const tableName = 'pi-pics3';
 
-export async function listMostRecentRecords(maxKeys) {
+export async function listMostRecentRecords(maxKeys, pageDate) {
     const ddb = new AWS.DynamoDB();
-    const params = {
+
+    if (!pageDate) {
+        pageDate = new Date(2050, 1, 1);
+    }
+
+    let params = {
         TableName: tableName,
         Select: ddb.ALL_ATTRIBUTES,
         ScanIndexForward: false,
-        KeyConditionExpression: "#ps = :partitionkeyval",
-        ExpressionAttributeNames: { "#ps": 'picture-set' },
+        KeyConditionExpression: "#ps = :partitionkeyval and #sk < :sortkeyval",
+        ExpressionAttributeNames: { '#ps': 'picture-set' , '#sk': 'date'},
         ExpressionAttributeValues: {
-            ':partitionkeyval': {'S' : 'babypi' }
+            ':partitionkeyval': {'S' : 'babypi' },
+            ':sortkeyval': {'S': pageDate.toISOString()}
         },
         Limit: maxKeys
     };
-    
+
     return new Promise(function (resolve, reject) {
         ddb.query(params, (err, data) => {
             if (err) { 

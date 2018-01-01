@@ -49,32 +49,28 @@ class App extends Component {
 
   renderLoginOrContent = () => {
     if (this.state.authState === LOADING_COOKIE) {
-      return (<div>Loading your cookie...</div>);
-    } else if (this.state.authState === LOGGED_IN ) {
+      return (<div class>Loading your cookie...</div>);
+    } else if (this.state.authState === LOGGED_IN) {
       return <Images />
     } else if (this.state.authState === LOGGED_OUT) {
       return <LoginForm onLoggedIn={this.onLoggedIn} />
     } else {
-      return (<div>Something went wrong</div>);
+      return (<div>Something went wrong...</div>);
     }
   }
 
   render() {
     return (
-      <div>
-        <div className="App">
-          <header className="App-header">
-            <h1 className="App-title">his name is J.R.</h1>
-          </header>
+      <div className="App">
+        <header className="App-header">
+          <h1 className="App-title">his name is J.R.</h1>
+        </header>
 
-          {this.renderLoginOrContent()}
-        </div>
+        {this.renderLoginOrContent()}
         <Footer />
       </div>
     );
   }
-
-
 }
 
 export default App;
