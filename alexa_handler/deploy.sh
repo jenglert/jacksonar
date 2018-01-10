@@ -10,6 +10,9 @@ if [ -f index.zip ]; then
 fi
 
 cd src 
+
+npm install --save 
+
 "c:/Program Files/7-Zip/7z.exe" a -r ../index.zip *
 cd .. 
-aws lambda update-function-code --function-name JacksonarAlexa --zip-file fileb://index.zip
+aws lambda update-function-code --publish --function-name JacksonarAlexa --zip-file fileb://index.zip

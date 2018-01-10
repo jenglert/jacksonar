@@ -1,9 +1,9 @@
 {
-    "name": "alexa-skill-kit-sdk-factskill",
-    "version": "1.0.0",
-    "private": true,
-    "dependencies": {
-      "alexa-sdk": "^1.0.10"
-    }
+  "name": "jacksonar-alexa-handler",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "dependencies": {
+    "alexa-sdk": "^1.0.10"
   }
-  
+}
