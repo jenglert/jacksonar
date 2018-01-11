@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Snapshot from './Snapshot.js';
 import * as DDB from './DDB.js';
-import './Images.css';
+import './styles/Images.css';
 
 class Images extends Component {
 

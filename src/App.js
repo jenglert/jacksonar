@@ -6,57 +6,78 @@ import Images from './Images.js';
 import AWS from 'aws-sdk';
 import LoginState from './LoginState.js';
 import { setAwsCredentials, refreshAccessKey } from './Aws.js';
+import {
+  Route,
+} from 'react-router-dom';
+import Redirect from 'react-router-dom/Redirect';
 
-// When a cookie is present, we cannot be sure it is valid until we refresh the access token
-// to validate.
-const LOADING_COOKIE = 0;
-const LOGGED_IN = 1;
-const LOGGED_OUT = 2;
+
+const LOADING_PATH = '/loading';
+const IMAGES_PATH = '/images';
+const LOGGED_OUT_PATH = '/login';
+const SOMETHING_WENT_WRONG_PATH = '/something-went-wrong';
 
 class App extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {
-      authState: LOGGED_OUT
-    }
 
     // Might as well set the global var here...
     AWS.config.region = 'us-east-1';
     AWS.config.update({ maxRetries: 2 });
 
+    this.state = {
+      isAuthed: false
+    };
+  }
+
+  componentDidMount = () => {
     const cookieAccessKey = LoginState.getAccessKey();
-    let that = this;
+    const history = this.props.history;
+    const that = this;
     if (cookieAccessKey != null) {
-      this.state.authState = LOADING_COOKIE;
+      history.push(LOADING_PATH);
 
       setAwsCredentials(cookieAccessKey);
       refreshAccessKey().then(function (ok) {
         console.log("Access key validated: " + ok);
-        that.setState({ authState: LOGGED_IN });
+        that.setState({isAuthed: true});
+        history.push(IMAGES_PATH);
       }).catch(function (err) {
         console.log("Access key is not valid. Removing token.  Details: " + err);
         LoginState.removeAccessKey();
-        that.setState({ authState: LOGGED_OUT });
+        history.push(LOGGED_OUT_PATH);
       });
     }
   }
 
   onLoggedIn = (accessKey) => {
     LoginState.saveAccessKey(accessKey);
-    this.setState({ authState: LOGGED_IN });
+    this.setState({isAuthed: true});
   }
 
-  renderLoginOrContent = () => {
-    if (this.state.authState === LOADING_COOKIE) {
-      return (<div class>Loading your cookie...</div>);
-    } else if (this.state.authState === LOGGED_IN) {
-      return <Images />
-    } else if (this.state.authState === LOGGED_OUT) {
-      return <LoginForm onLoggedIn={this.onLoggedIn} />
-    } else {
-      return (<div>Something went wrong...</div>);
-    }
+  Loading = () => {
+    return (<div>Loading your cookie...</div>);
+  }
+
+  SomethingWentWrong = () => {
+    return (<div>Something went wrong!</div>);
+  }
+
+  PrivateRoute = ({ component: Component, ...rest }) => {
+    return (<Route {...rest} render={props => {
+      if (this.props.location.pathname === LOADING_PATH) {
+        return <Redirect to={{
+          pathname: LOADING_PATH
+        }} />
+      } else if (this.props.location.pathname === LOGGED_OUT_PATH || !this.state.isAuthed) {
+        return <Redirect to={{
+          pathname: LOGGED_OUT_PATH
+        }} />
+      } else {
+        return <Component {...props} />
+      }
+    }} />);
   }
 
   render() {
@@ -66,7 +87,15 @@ class App extends Component {
           <h1 className="App-title">his name is J.R.</h1>
         </header>
 
-        {this.renderLoginOrContent()}
+        <Route path={LOGGED_OUT_PATH} render={({ history }) => {
+          return <LoginForm onLoggedIn={(accessKey) => {
+            this.onLoggedIn(accessKey);
+            history.push(IMAGES_PATH);
+          }} />
+        }} />
+        <Route path={LOADING_PATH} component={this.Loading} />
+        <Route path={SOMETHING_WENT_WRONG_PATH} component={this.SomethingWentWrong} />
+        <this.PrivateRoute path={IMAGES_PATH} component={Images} />
         <Footer />
       </div>
     );

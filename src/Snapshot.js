@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import * as S3 from './S3.js';
 import Time from 'react-time'
-import './Snapshot.css';
+import './styles/Snapshot.css';
 
 class Snapshot extends Component {
 
