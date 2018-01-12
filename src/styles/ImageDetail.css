@@ -1,0 +1,9 @@
+.image-detail-container { 
+    padding: 20px;
+}
+
+.image-detail-container IMG { 
+    width: 100%;
+    max-width: 100vh;
+    max-height: 90vh;
+}

@@ -6,16 +6,16 @@ import Images from './Images.js';
 import AWS from 'aws-sdk';
 import LoginState from './LoginState.js';
 import { setAwsCredentials, refreshAccessKey } from './Aws.js';
-import {
-  Route,
-} from 'react-router-dom';
+import { Route } from 'react-router-dom';
 import Redirect from 'react-router-dom/Redirect';
+import ImageDetail from './ImageDetail';
 
 
 const LOADING_PATH = '/loading';
 const IMAGES_PATH = '/images';
 const LOGGED_OUT_PATH = '/login';
 const SOMETHING_WENT_WRONG_PATH = '/something-went-wrong';
+const IMAGE_DETAIL_PATH = '/image-detail/:filename';
 
 class App extends Component {
 
@@ -96,6 +96,7 @@ class App extends Component {
         <Route path={LOADING_PATH} component={this.Loading} />
         <Route path={SOMETHING_WENT_WRONG_PATH} component={this.SomethingWentWrong} />
         <this.PrivateRoute path={IMAGES_PATH} component={Images} />
+        <this.PrivateRoute path={IMAGE_DETAIL_PATH} component={ImageDetail} />
         <Footer />
       </div>
     );
