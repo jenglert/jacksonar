@@ -6,12 +6,11 @@ import Images from './Images.js';
 import AWS from 'aws-sdk';
 import LoginState from './LoginState.js';
 import { setAwsCredentials, refreshAccessKey } from './Aws.js';
-import { Route } from 'react-router-dom';
+import { Route, Switch } from 'react-router-dom';
 import Redirect from 'react-router-dom/Redirect';
 import ImageDetail from './ImageDetail';
 
 
-const LOADING_PATH = '/loading';
 const IMAGES_PATH = '/images';
 const LOGGED_OUT_PATH = '/login';
 const SOMETHING_WENT_WRONG_PATH = '/something-went-wrong';
@@ -27,7 +26,7 @@ class App extends Component {
     AWS.config.update({ maxRetries: 2 });
 
     this.state = {
-      isAuthed: false
+      isAuthed: false,
     };
   }
 
@@ -39,7 +38,6 @@ class App extends Component {
     // Handle the login cookies
     const cookieAccessKey = LoginState.getAccessKey();
     if (cookieAccessKey != null) {
-      history.push(LOADING_PATH);
 
       setAwsCredentials(cookieAccessKey);
       refreshAccessKey().then(function (ok) {
@@ -50,7 +48,7 @@ class App extends Component {
         console.log("Access key is not valid. Removing token.  Details: " + err);
         LoginState.removeAccessKey();
         history.push(LOGGED_OUT_PATH);
-      });
+      })
     } else {
       // Handle slash routes
       if (this.props.location.pathname === '/') {
@@ -64,21 +62,13 @@ class App extends Component {
     this.setState({ isAuthed: true });
   }
 
-  Loading = () => {
-    return (<div>Loading your cookie...</div>);
-  }
-
   SomethingWentWrong = () => {
     return (<div>Something went wrong!</div>);
   }
 
   PrivateRoute = ({ component: Component, ...rest }) => {
     return (<Route {...rest} render={props => {
-      if (this.props.location.pathname === LOADING_PATH) {
-        return <Redirect to={{
-          pathname: LOADING_PATH
-        }} />
-      } else if (this.props.location.pathname === LOGGED_OUT_PATH || !this.state.isAuthed) {
+      if (!this.state.isAuthed) {
         return <Redirect to={{
           pathname: LOGGED_OUT_PATH
         }} />
@@ -101,10 +91,10 @@ class App extends Component {
             history.push(IMAGES_PATH);
           }} />
         }} />
-        <Route path={LOADING_PATH} component={this.Loading} />
         <Route path={SOMETHING_WENT_WRONG_PATH} component={this.SomethingWentWrong} />
         <this.PrivateRoute path={IMAGES_PATH} component={Images} />
         <this.PrivateRoute path={IMAGE_DETAIL_PATH} component={ImageDetail} />
+        <Route display={() => "No match"} />
         <Footer />
       </div>
     );
