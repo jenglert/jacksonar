@@ -11,10 +11,10 @@ import Redirect from 'react-router-dom/Redirect';
 import ImageDetail from './ImageDetail';
 
 
-const IMAGES_PATH = '/images';
-const LOGGED_OUT_PATH = '/login';
-const SOMETHING_WENT_WRONG_PATH = '/something-went-wrong';
-const IMAGE_DETAIL_PATH = '/image-detail/:filename';
+export const IMAGES_PATH = '/images';
+export const LOGGED_OUT_PATH = '/login';
+export const SOMETHING_WENT_WRONG_PATH = '/something-went-wrong';
+export const IMAGE_DETAIL_PATH = '/image-detail/:filename';
 
 class App extends Component {
 

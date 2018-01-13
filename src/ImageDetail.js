@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import * as S3 from './S3.js';
 import './styles/ImageDetail.css';
+import { withRouter } from 'react-router';
+import { IMAGES_PATH } from './App.js';
 
 class ImageDetail extends Component {
 
@@ -10,6 +12,10 @@ class ImageDetail extends Component {
         this.state = {
             filename: props.match.params.filename
         }
+    }
+
+    imageClick = () => {
+        this.props.history.push(IMAGES_PATH);
     }
 
     render() {
@@ -24,10 +30,10 @@ class ImageDetail extends Component {
 
         return (
             <div className="image-detail-container">
-                <img id={"img-det-" + fn} alt="Jackson" />
+                <img id={"img-det-" + fn} alt="Jackson" onClick={this.imageClick} />
             </div>
         );
     }
 }
 
-export default ImageDetail;
+export default withRouter(ImageDetail);
