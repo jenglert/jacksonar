@@ -32,28 +32,36 @@ class App extends Component {
   }
 
   componentDidMount = () => {
-    const cookieAccessKey = LoginState.getAccessKey();
+
     const history = this.props.history;
     const that = this;
+
+    // Handle the login cookies
+    const cookieAccessKey = LoginState.getAccessKey();
     if (cookieAccessKey != null) {
       history.push(LOADING_PATH);
 
       setAwsCredentials(cookieAccessKey);
       refreshAccessKey().then(function (ok) {
         console.log("Access key validated: " + ok);
-        that.setState({isAuthed: true});
+        that.setState({ isAuthed: true });
         history.push(IMAGES_PATH);
       }).catch(function (err) {
         console.log("Access key is not valid. Removing token.  Details: " + err);
         LoginState.removeAccessKey();
         history.push(LOGGED_OUT_PATH);
       });
+    } else {
+      // Handle slash routes
+      if (this.props.location.pathname === '/') {
+        history.push(IMAGES_PATH);
+      }
     }
   }
 
   onLoggedIn = (accessKey) => {
     LoginState.saveAccessKey(accessKey);
-    this.setState({isAuthed: true});
+    this.setState({ isAuthed: true });
   }
 
   Loading = () => {
