@@ -34,6 +34,11 @@ class App extends Component {
 
     const history = this.props.history;
     const that = this;
+    let routeToDisplay = this.props.location.pathname || IMAGES_PATH;
+
+    if (routeToDisplay === '/') {
+      routeToDisplay = IMAGES_PATH;
+    }
 
     // Handle the login cookies
     const cookieAccessKey = LoginState.getAccessKey();
@@ -43,17 +48,12 @@ class App extends Component {
       refreshAccessKey().then(function (ok) {
         console.log("Access key validated: " + ok);
         that.setState({ isAuthed: true });
-        history.push(IMAGES_PATH);
+        history.push(routeToDisplay);
       }).catch(function (err) {
         console.log("Access key is not valid. Removing token.  Details: " + err);
         LoginState.removeAccessKey();
         history.push(LOGGED_OUT_PATH);
       })
-    } else {
-      // Handle slash routes
-      if (this.props.location.pathname === '/') {
-        history.push(IMAGES_PATH);
-      }
     }
   }
 
@@ -67,6 +67,7 @@ class App extends Component {
   }
 
   PrivateRoute = ({ component: Component, ...rest }) => {
+    console.log("Private route:", this.state, Component);
     return (<Route {...rest} render={props => {
       if (!this.state.isAuthed) {
         return <Redirect to={{
@@ -92,9 +93,9 @@ class App extends Component {
           }} />
         }} />
         <Route path={SOMETHING_WENT_WRONG_PATH} component={this.SomethingWentWrong} />
+        <Redirect from="/" to={IMAGES_PATH} />
         <this.PrivateRoute path={IMAGES_PATH} component={Images} />
         <this.PrivateRoute path={IMAGE_DETAIL_PATH} component={ImageDetail} />
-        <Route display={() => "No match"} />
         <Footer />
       </div>
     );
