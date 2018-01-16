@@ -2,8 +2,11 @@ import React, { Component } from 'react';
 import Snapshot from './Snapshot.js';
 import * as DDB from './DDB.js';
 import './styles/Images.css';
+import { buildSnapshot } from './utils.js';
 
 class Images extends Component {
+
+    PicPageSize = 10;
 
     constructor(props) {
         super(props);
@@ -23,8 +26,8 @@ class Images extends Component {
             lastDate = lastRecord.date;
         }
         
-        DDB.listMostRecentRecords(3, lastDate).then((result) => {
-            let newItems = result.Items.map((item) => Images.buildSnapshot(item));
+        DDB.listMostRecentRecords(this.PicPageSize, lastDate).then((result) => {
+            let newItems = result.Items.map((item) =>  buildSnapshot(item));
             let hasMore = result.LastEvaluatedKey && Object.keys(result.LastEvaluatedKey).length !== 0;
             this.setState({
                 hasMoreLoading: false,
@@ -48,15 +51,6 @@ class Images extends Component {
         this.loadSnapshots(() => {
             this.setState({ hasMoreLoading: false });
         })
-    }
-
-    static buildSnapshot(ddbResult) {
-        return {
-            filename: ddbResult.filename["S"],
-            humidity: parseFloat(ddbResult.humidity["N"]),
-            tempInF: parseFloat(ddbResult.tempInF["N"]),
-            date: new Date(ddbResult.date["S"])
-        };
     }
 
     renderShowMoreButton = () => {

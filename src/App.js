@@ -6,7 +6,7 @@ import Images from './Images.js';
 import AWS from 'aws-sdk';
 import LoginState from './LoginState.js';
 import { setAwsCredentials, refreshAccessKey } from './Aws.js';
-import { Route, Switch } from 'react-router-dom';
+import { Route } from 'react-router-dom';
 import Redirect from 'react-router-dom/Redirect';
 import ImageDetail from './ImageDetail';
 
@@ -15,6 +15,8 @@ export const IMAGES_PATH = '/images';
 export const LOGGED_OUT_PATH = '/login';
 export const SOMETHING_WENT_WRONG_PATH = '/something-went-wrong';
 export const IMAGE_DETAIL_PATH = '/image-detail/:filename';
+
+const LOGGED_IN_PATH_REGEX = /^\/image.*/;
 
 class App extends Component {
 
@@ -36,7 +38,7 @@ class App extends Component {
     const that = this;
     let routeToDisplay = this.props.location.pathname || IMAGES_PATH;
 
-    if (routeToDisplay === '/') {
+    if (!routeToDisplay.match(LOGGED_IN_PATH_REGEX)) {
       routeToDisplay = IMAGES_PATH;
     }
 
@@ -67,7 +69,6 @@ class App extends Component {
   }
 
   PrivateRoute = ({ component: Component, ...rest }) => {
-    console.log("Private route:", this.state, Component);
     return (<Route {...rest} render={props => {
       if (!this.state.isAuthed) {
         return <Redirect to={{
@@ -93,7 +94,6 @@ class App extends Component {
           }} />
         }} />
         <Route path={SOMETHING_WENT_WRONG_PATH} component={this.SomethingWentWrong} />
-        <Redirect from="/" to={IMAGES_PATH} />
         <this.PrivateRoute path={IMAGES_PATH} component={Images} />
         <this.PrivateRoute path={IMAGE_DETAIL_PATH} component={ImageDetail} />
         <Footer />

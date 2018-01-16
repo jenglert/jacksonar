@@ -32,3 +32,29 @@ export async function listMostRecentRecords(maxKeys, pageDate) {
         });
     })
 }
+
+export async function getRecordDetails(filename) {
+     const ddb = new AWS.DynamoDB();
+
+     let params = {
+        TableName: tableName,
+        IndexName: 'filename-index',
+        Select: ddb.ALL_ATTRIBUTES,
+        KeyConditionExpression: "#fn = :v_filename",
+        ExpressionAttributeNames: { '#fn': 'filename'},
+        ExpressionAttributeValues: {
+            ':v_filename': {'S' : filename }
+        },
+        Limit: 1
+    };
+
+     return new Promise(function(resolve, reject) {
+        ddb.query(params, function(err, data) {
+            if (err) {
+                reject(err);
+            }
+
+            return resolve(data);
+        });
+     });
+}   

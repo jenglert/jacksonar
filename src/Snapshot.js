@@ -27,7 +27,7 @@ class Snapshot extends Component {
             <div key={fn} className="snapshot" onClick={() => this.onSnapshotClick(fn)} >
                 <img id={"img-" + fn} src="" alt=""  />
                 <div className="time">
-                    <Time value={date} titleFormat="YYYY/MM/DD HH:mm" relative />
+                    <Time value={date} format="h:mm a"  />
                 </div>
                 <div className="temp">
                     <div>{tempInF}&#176;F</div>

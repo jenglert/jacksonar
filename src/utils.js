@@ -41,3 +41,12 @@ export function safelyGetErrorMessage(err) {
 
     return "Error not valid.  Error Code: 33";
 }
+
+export function buildSnapshot(ddbResult) {
+    return {
+        filename: ddbResult.filename["S"],
+        humidity: parseFloat(ddbResult.humidity["N"]),
+        tempInF: parseFloat(ddbResult.tempInF["N"]),
+        date: new Date(ddbResult.date["S"])
+    };
+}

@@ -1,5 +1,14 @@
 .image-detail-container { 
     padding: 20px;
+    display: flex;
+}
+
+.img-det-list { 
+    padding-left: 10px;
+}
+
+.image-detail-container LABEL { 
+    font-weight: bold;
 }
 
 .image-detail-container IMG { 
