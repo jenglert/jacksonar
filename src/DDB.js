@@ -14,18 +14,18 @@ export async function listMostRecentRecords(maxKeys, pageDate) {
         Select: ddb.ALL_ATTRIBUTES,
         ScanIndexForward: false,
         KeyConditionExpression: "#ps = :partitionkeyval and #sk < :sortkeyval",
-        ExpressionAttributeNames: { '#ps': 'picture-set' , '#sk': 'date'},
+        ExpressionAttributeNames: { '#ps': 'picture-set', '#sk': 'date' },
         ExpressionAttributeValues: {
-            ':partitionkeyval': {'S' : 'babypi' },
-            ':sortkeyval': {'S': pageDate.toISOString()}
+            ':partitionkeyval': { 'S': 'babypi' },
+            ':sortkeyval': { 'S': pageDate.toISOString() }
         },
         Limit: maxKeys
     };
 
     return new Promise(function (resolve, reject) {
         ddb.query(params, (err, data) => {
-            if (err) { 
-                return reject(err); 
+            if (err) {
+                return reject(err);
             }
 
             return resolve(data);
@@ -34,27 +34,63 @@ export async function listMostRecentRecords(maxKeys, pageDate) {
 }
 
 export async function getRecordDetails(filename) {
-     const ddb = new AWS.DynamoDB();
+    const ddb = new AWS.DynamoDB();
 
-     let params = {
+    let params = {
         TableName: tableName,
         IndexName: 'filename-index',
         Select: ddb.ALL_ATTRIBUTES,
         KeyConditionExpression: "#fn = :v_filename",
-        ExpressionAttributeNames: { '#fn': 'filename'},
+        ExpressionAttributeNames: { '#fn': 'filename' },
         ExpressionAttributeValues: {
-            ':v_filename': {'S' : filename }
+            ':v_filename': { 'S': filename }
         },
         Limit: 1
     };
 
-     return new Promise(function(resolve, reject) {
-        ddb.query(params, function(err, data) {
+    return new Promise(function (resolve, reject) {
+        ddb.query(params, function (err, data) {
             if (err) {
-                reject(err);
+                return reject(err);
             }
 
             return resolve(data);
         });
-     });
-}   
+    });
+}
+
+export async function markIsJackson(date, isJackson) {
+    const ddb = new AWS.DynamoDB();
+
+    var params = {
+        ExpressionAttributeNames: {
+            "#ij": "isJackson",
+        },
+        ExpressionAttributeValues: {
+            ":b": {
+                N: isJackson ? "1" : "0"
+            }
+        },
+        Key: {
+            "picture-set": {
+                S: 'babypi',
+            },
+            "date": {
+                S: date
+            }
+        },
+        ReturnValues: "ALL_NEW",
+        TableName: tableName,
+        UpdateExpression: "SET #ij = :b"
+    };
+
+    return new Promise(function (resolve, reject) {
+        ddb.updateItem(params, function(err, data) {
+            if (err) {
+                return reject(err);
+            }
+
+            return resolve(data);
+        });
+    });
+}

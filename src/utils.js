@@ -47,6 +47,7 @@ export function buildSnapshot(ddbResult) {
         filename: ddbResult.filename["S"],
         humidity: parseFloat(ddbResult.humidity["N"]),
         tempInF: parseFloat(ddbResult.tempInF["N"]),
-        date: new Date(ddbResult.date["S"])
+        date: new Date(ddbResult.date["S"]),
+        isJackson: ddbResult.isJackson && ddbResult.isJackson["N"] === "1" ? "Yep" : "Nope" || "N/A",
     };
 }

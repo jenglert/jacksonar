@@ -16,3 +16,11 @@
     max-width: 100vh;
     max-height: 90vh;
 }
+
+.is-jackson BUTTON { 
+    margin: 10px;
+    background-color: #64d2ff;
+    border-radius: 3px;
+    padding: 5px;
+    font-size: 18px;
+}

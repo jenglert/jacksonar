@@ -63,7 +63,7 @@ export function PasswordNeedsResetError(message, cognitoUser) {
     this.cognitoUser = cognitoUser;
     this.stack = (new Error()).stack;
 }
-PasswordNeedsResetError.prototype = new Error;
+PasswordNeedsResetError.prototype = new Error();
 
 
 export const unlockPassword = (username, newPassword, verificationCode) => {
