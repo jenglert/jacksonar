@@ -4,7 +4,6 @@ const tableName = 'pi-pics3';
 
 export async function listMostRecentRecords(maxKeys, pageDate) {
     const ddb = new AWS.DynamoDB();
-
     if (!pageDate) {
         pageDate = new Date(2050, 1, 1);
     }
@@ -91,6 +90,43 @@ export async function markIsJackson(date, isJackson) {
             }
 
             return resolve(data);
+        });
+    });
+}
+
+export async function scanNext(date, backwards = false) {
+    const ddb = new AWS.DynamoDB();
+
+    var params = {
+        TableName: tableName,
+        ExpressionAttributeNames: {
+            "#PS" : "picture-set",
+            "#DA" : "date",
+        },
+        ExpressionAttributeValues: {
+            ":d" : {
+                "S": date
+            },
+            ":ps" : {
+                "S": "babypi"
+            }
+        },
+        KeyConditionExpression: "#DA " + (backwards ? "<" : ">") + " :d  AND #PS = :ps",
+        ScanIndexForward: backwards ? false : true,
+        Limit: 1 
+    }; 
+
+    return new Promise(function (resolve, reject) {
+        ddb.query(params, function(err, data) {
+            if (err) { 
+                return reject(err);
+            }
+
+            if (data.Items.length === 0) {
+                return reject("No more records");
+            }
+
+            return resolve(data.Items[0].filename.S);
         });
     });
 }
