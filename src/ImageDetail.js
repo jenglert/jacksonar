@@ -73,7 +73,7 @@ class ImageDetail extends Component {
 
         markIsJackson(this.state.date, isJackson)
             .then(result => {
-                that.reloadRecordDetails();
+                that.loadSnapshot(that.state.filename);
             })
             .catch(err => {
                 console.error("Unable to update is jackson: " + err);
