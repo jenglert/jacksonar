@@ -96,6 +96,7 @@ class App extends Component {
         <Route path={SOMETHING_WENT_WRONG_PATH} component={this.SomethingWentWrong} />
         <this.PrivateRoute path={IMAGES_PATH} component={Images} />
         <this.PrivateRoute path={IMAGE_DETAIL_PATH} component={ImageDetail} />
+        <Redirect from="/" to={LOGGED_OUT_PATH} />
         <Footer />
       </div>
     );
